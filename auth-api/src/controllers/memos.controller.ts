@@ -49,6 +49,8 @@ export const deleteMemo = async (
   }
 };
 
+
+
 export const getMemoById = async (
   req: Request,
   res: Response,
@@ -56,13 +58,11 @@ export const getMemoById = async (
 ) => {
   try {
     const memoId = Number(req.params.id);
-    const memo = await MemosService.getMemoById(memoId);
+    const userId = req.user!.id;
+    // Serviceを呼ぶだけ！
+    const memo = await MemosService.getMemoByIdForUser(userId, memoId);
     if (!memo) {
       return res.status(404).json({message: "メモが見つかりません"});
-    }
-    // 所有者チェック（任意）: req.user!.id と一致するか
-    if ((memo as any).authorId !== req.user!.id) {
-      return res.status(403).json({message: "アクセス権がありません"});
     }
     res.json(memo);
   } catch (error) {
@@ -80,16 +80,8 @@ export const updateMemo = async (
     const userId = req.user!.id;
     const {title, content} = req.body;
 
-    // 取得して所有者チェック
-    const memo = await MemosService.getMemoById(memoId);
-    if (!memo) {
-      return res.status(404).json({message: "メモが見つかりません"});
-    }
-    if ((memo as any).authorId !== userId) {
-      return res.status(403).json({message: "更新権限がありません"});
-    }
-
-    const updated = await MemosService.updateMemo(memoId, title, content);
+    // Serviceを呼ぶだけ！
+    const updated = await MemosService.updateMemoForUser(userId, memoId, title, content);
     res.json(updated);
   } catch (error) {
     next(error);
