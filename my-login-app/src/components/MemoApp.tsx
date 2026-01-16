@@ -16,6 +16,7 @@ type MemoAppProps = {
 
 // const API_BASE_URL = "http://localhost:8000/api";
 
+// メモの一覧取得・作成・削除をまとめて行うメインコンポーネント
 export const MemoApp = ({ setMessage, onLogout }: MemoAppProps) => {
   const [memos, setMemos] = useState<Memo[]>([]); // メモの一覧を保持するためのstateです。初期値は空の配列です。
   const [newMemoTitle, setNewMemoTitle] = useState(""); // 新規作成フォームの「タイトル」入力欄の値を保持するstateです。

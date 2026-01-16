@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 
+// 本番では環境変数に置き換える想定のAPIルート
 const API_BASE_URL = "http://localhost:8000/api";
 
 /**
@@ -17,6 +18,7 @@ export const useApi = <T>() => {
       setIsLoading(true);
       setError(null);
       try {
+        // すべてのAPIでCookieベースの認証を維持する
         const res = await fetch(`${API_BASE_URL}${endpoint}`, {
           credentials: "include",
           ...options,
@@ -34,7 +36,9 @@ export const useApi = <T>() => {
             errorData = await res.json();
           } else {
             // JSONでない場合（HTMLなど）は、コンポーネント側で処理しやすいようにエラーオブジェクトを作成
-            errorData = { message: `サーバーエラー: ${res.status} ${res.statusText}` };
+            errorData = {
+              message: `サーバーエラー: ${res.status} ${res.statusText}`,
+            };
           }
           throw errorData;
         }

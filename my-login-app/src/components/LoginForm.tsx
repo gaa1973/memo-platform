@@ -9,14 +9,13 @@ type LoginFormProps = {
   setMessage: (message: string) => void;
 };
 
+// ログイン/登録フォームの入力バリデーションをzodで定義
 const loginSchema = z.object({
   email: z
     .string()
     .min(1, "メールアドレスを入力してください")
     .email("有効なメールアドレス形式で入力してください"),
-  password: z
-    .string()
-    .min(6, "パスワードは6文字以上で入力してください"),
+  password: z.string().min(6, "パスワードは6文字以上で入力してください"),
 });
 
 type LoginFormInputs = z.infer<typeof loginSchema>;
@@ -27,13 +26,17 @@ export const LoginForm = ({ onLoginSuccess, setMessage }: LoginFormProps) => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInputs>({
+    // 入力値の検証にzodを使う
     resolver: zodResolver(loginSchema),
   });
 
+  // APIの呼び出しエラーをまとめて表示するためのstate
   const [generalError, setGeneralError] = useState<string | null>(null);
   const { request, isLoading } = useApi();
+  // trueならログイン、falseなら新規登録モード
   const [isLoginMode, setIsLoginMode] = useState(true);
 
+  // フォーム送信時の処理（ログイン/新規登録を切り替えて呼び出す）
   const onSubmit = async (data: LoginFormInputs) => {
     const endpoint = isLoginMode ? "/auth/login" : "/auth/registration";
     const successMsg = isLoginMode ? "ログイン成功" : "新規登録成功";
@@ -57,6 +60,7 @@ export const LoginForm = ({ onLoginSuccess, setMessage }: LoginFormProps) => {
   };
 
   return (
+    // カード状のレイアウトでフォームを表示
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
         <h1 className="text-2xl font-bold text-center text-gray-900">
@@ -120,11 +124,7 @@ export const LoginForm = ({ onLoginSuccess, setMessage }: LoginFormProps) => {
               disabled={isLoading}
               className="w-full px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              {isLoading
-                ? "処理中..."
-                : isLoginMode
-                ? "ログイン"
-                : "新規登録"}
+              {isLoading ? "処理中..." : isLoginMode ? "ログイン" : "新規登録"}
             </button>
             <div className="text-center">
               <button
